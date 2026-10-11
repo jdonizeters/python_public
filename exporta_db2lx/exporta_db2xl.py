@@ -89,7 +89,7 @@ class AppExportacao(ctk.CTk):
     super().__init__()
 
     self.title("Exportador Protheus para Excel")
-    self.geometry("480x750")
+    self.geometry("480x810")  # Altura ajustada para acomodar os novos labels
     self.resizable(False, False)
 
     self.cancelar_execucao = False
@@ -103,6 +103,7 @@ class AppExportacao(ctk.CTk):
     )
     self.label_titulo.pack(pady=(10, 5))
 
+    # --- Seção de Configurações do Banco de Dados ---
     self.frame_db = ctk.CTkFrame(self, fg_color="transparent")
     self.frame_db.pack(pady=(0, 5), padx=15, fill="x")
 
@@ -138,42 +139,68 @@ class AppExportacao(ctk.CTk):
 
       self.entries[chave] = entry
 
+    # --- Seção de Saída e Filtros com Labels Individuais ---
     self.frame_filtros = ctk.CTkFrame(self, fg_color="transparent")
     self.frame_filtros.pack(pady=(0, 5), padx=15, fill="x")
 
     self.label_filtros_titulo = ctk.CTkLabel(
         self.frame_filtros,
-        text="Filtros, Saída e Aparência",
+        text="Saída, Filtros e Aparência",
         font=ctk.CTkFont(size=12, weight="bold"),
     )
     self.label_filtros_titulo.pack(anchor="w", pady=(0, 2))
 
+    # 1. Arquivo de Saída
+    lbl_arquivo = ctk.CTkLabel(
+        self.frame_filtros,
+        text="Nome do arquivo de saída:",
+        font=ctk.CTkFont(size=11),
+    )
+    lbl_arquivo.pack(anchor="w", pady=(2, 1))
+
     self.entry_arquivo = ctk.CTkEntry(
         self.frame_filtros,
-        placeholder_text="Nome da planilha de saída (ex: PROTHEUS.xlsx)",
+        placeholder_text="ex: PROTHEUS.xlsx",
         width=445,
         height=26,
     )
-    self.entry_arquivo.pack(pady=(2, 4))
+    self.entry_arquivo.pack(pady=(0, 4))
+
+    # 2. Ignorar Tabelas
+    lbl_ignorar = ctk.CTkLabel(
+        self.frame_filtros,
+        text="Ignorar tabelas contendo (separado por ';'):",
+        font=ctk.CTkFont(size=11),
+    )
+    lbl_ignorar.pack(anchor="w", pady=(2, 1))
 
     self.entry_ignorar = ctk.CTkEntry(
         self.frame_filtros,
-        placeholder_text="Ignorar tabelas contendo (ex: 990; 010; LOG)",
+        placeholder_text="ex: 990; 010; LOG",
         width=445,
         height=26,
     )
     self.entry_ignorar.pack(pady=(0, 4))
 
+    # 3. Filtrar por Prefixos
+    lbl_prefixos = ctk.CTkLabel(
+        self.frame_filtros,
+        text="Somente tabelas com prefixos (separado por ';'):",
+        font=ctk.CTkFont(size=11),
+    )
+    lbl_prefixos.pack(anchor="w", pady=(2, 1))
+
     self.entry_prefixos = ctk.CTkEntry(
         self.frame_filtros,
-        placeholder_text="Somente prefixos (ex: SX; SB; SC - vazio para todas)",
+        placeholder_text="ex: SX; SB; SC (vazio para todas)",
         width=445,
         height=26,
     )
     self.entry_prefixos.pack(pady=(0, 4))
 
+    # Linha horizontal compacta para Checkbox e Tema
     frame_opcoes = ctk.CTkFrame(self.frame_filtros, fg_color="transparent")
-    frame_opcoes.pack(fill="x", pady=(0, 2))
+    frame_opcoes.pack(fill="x", pady=(2, 2))
 
     self.check_vazias = ctk.CTkCheckBox(
         frame_opcoes,
@@ -199,6 +226,7 @@ class AppExportacao(ctk.CTk):
     )
     self.option_tema.pack(side="left")
 
+    # --- Botões Padronizados ---
     LARGURA_BTN = 445
     ALTURA_BTN = 30
 
@@ -484,7 +512,6 @@ class AppExportacao(ctk.CTk):
     return tables_filtradas
 
   def sanitizar_nome_aba(self, nome_tabela):
-    # Trata caracteres inválidos e evita palavras reservadas do Excel/openpyxl (ex: SRA)
     nome_limpo = re.sub(r'[:\\/\?\*\[\]]', "_", nome_tabela)
     if nome_limpo.upper() in ["SRA", "LOG", "HISTORY"]:
       nome_limpo = f"T_{nome_limpo}"
