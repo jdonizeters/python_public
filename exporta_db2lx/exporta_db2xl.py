@@ -20,7 +20,6 @@ logging.basicConfig(
 
 # --- Arquivo de Configuração INI ---
 CONFIG_FILE = "config.ini"
-FILE_NAME = "PROTHEUS_TODAS_TABELAS.xlsx"
 
 
 class CustomMessageBox:
@@ -41,7 +40,6 @@ class CustomMessageBox:
     top.resizable(False, False)
     top.grab_set()
 
-    # Centraliza em relação à janela principal
     top.update_idletasks()
     x = parent.winfo_x() + (parent.winfo_width() // 2) - (400 // 2)
     y = parent.winfo_y() + (parent.winfo_height() // 2) - (200 // 2)
@@ -72,8 +70,6 @@ class CustomMessageBox:
           frame_botoes,
           text="Não",
           width=100,
-          fg_color="#7F8C8D",
-          hover_color="#62686F",
           command=lambda: (top.destroy(), callback_nao and callback_nao()),
       )
       btn_nao.pack(side="left", padx=10)
@@ -93,14 +89,13 @@ class AppExportacao(ctk.CTk):
     super().__init__()
 
     self.title("Exportador Protheus para Excel")
-    self.geometry("480x500")  # Janela compactada na vertical
+    self.geometry("480x750")
     self.resizable(False, False)
 
     self.cancelar_execucao = False
 
     self.carregar_configuracoes_iniciais()
 
-    # Título da Aplicação
     self.label_titulo = ctk.CTkLabel(
         self,
         text="Exportar Tabelas do Protheus",
@@ -108,7 +103,6 @@ class AppExportacao(ctk.CTk):
     )
     self.label_titulo.pack(pady=(10, 5))
 
-    # --- Seção de Configurações do Banco de Dados ---
     self.frame_db = ctk.CTkFrame(self, fg_color="transparent")
     self.frame_db.pack(pady=(0, 5), padx=15, fill="x")
 
@@ -132,7 +126,9 @@ class AppExportacao(ctk.CTk):
       row_frame = ctk.CTkFrame(self.frame_db, fg_color="transparent")
       row_frame.pack(fill="x", pady=1)
 
-      lbl = ctk.CTkLabel(row_frame, text=rotulo, width=105, anchor="w", font=ctk.CTkFont(size=11))
+      lbl = ctk.CTkLabel(
+          row_frame, text=rotulo, width=105, anchor="w", font=ctk.CTkFont(size=11)
+      )
       lbl.pack(side="left")
 
       entry = ctk.CTkEntry(row_frame, width=335, height=24)
@@ -142,27 +138,32 @@ class AppExportacao(ctk.CTk):
 
       self.entries[chave] = entry
 
-    # --- Seção de Filtros e Aparência ---
     self.frame_filtros = ctk.CTkFrame(self, fg_color="transparent")
     self.frame_filtros.pack(pady=(0, 5), padx=15, fill="x")
 
     self.label_filtros_titulo = ctk.CTkLabel(
         self.frame_filtros,
-        text="Filtros e Aparência",
+        text="Filtros, Saída e Aparência",
         font=ctk.CTkFont(size=12, weight="bold"),
     )
     self.label_filtros_titulo.pack(anchor="w", pady=(0, 2))
 
-    # Campo para ignorar tabelas
+    self.entry_arquivo = ctk.CTkEntry(
+        self.frame_filtros,
+        placeholder_text="Nome da planilha de saída (ex: PROTHEUS.xlsx)",
+        width=445,
+        height=26,
+    )
+    self.entry_arquivo.pack(pady=(2, 4))
+
     self.entry_ignorar = ctk.CTkEntry(
         self.frame_filtros,
         placeholder_text="Ignorar tabelas contendo (ex: 990; 010; LOG)",
         width=445,
         height=26,
     )
-    self.entry_ignorar.pack(pady=(2, 4))
+    self.entry_ignorar.pack(pady=(0, 4))
 
-    # Campo para considerar somente prefixos
     self.entry_prefixos = ctk.CTkEntry(
         self.frame_filtros,
         placeholder_text="Somente prefixos (ex: SX; SB; SC - vazio para todas)",
@@ -171,7 +172,6 @@ class AppExportacao(ctk.CTk):
     )
     self.entry_prefixos.pack(pady=(0, 4))
 
-    # Linha horizontal compacta para Checkbox e Tema
     frame_opcoes = ctk.CTkFrame(self.frame_filtros, fg_color="transparent")
     frame_opcoes.pack(fill="x", pady=(0, 2))
 
@@ -199,67 +199,64 @@ class AppExportacao(ctk.CTk):
     )
     self.option_tema.pack(side="left")
 
-    # --- Frame para os botões principais ---
-    self.frame_botoes = ctk.CTkFrame(self, fg_color="transparent")
-    self.frame_botoes.pack(pady=(4, 2))
+    LARGURA_BTN = 445
+    ALTURA_BTN = 30
 
     self.btn_iniciar = ctk.CTkButton(
-        self.frame_botoes,
+        self,
         text="Iniciar Exportação",
         command=self.iniciar_processo_thread,
-        height=32,
-        width=218,
+        height=ALTURA_BTN,
+        width=LARGURA_BTN,
         font=ctk.CTkFont(size=12, weight="bold"),
     )
-    self.btn_iniciar.pack(side="left", padx=4)
+    self.btn_iniciar.pack(pady=3)
 
     self.btn_parar = ctk.CTkButton(
-        self.frame_botoes,
+        self,
         text="Interromper",
         command=self.solicitar_parada,
-        height=32,
-        width=218,
-        fg_color="#C0392B",
-        hover_color="#962D22",
+        height=ALTURA_BTN,
+        width=LARGURA_BTN,
         state="disabled",
         font=ctk.CTkFont(size=12, weight="bold"),
     )
-    self.btn_parar.pack(side="left", padx=4)
-
-    # --- Frame para botões secundários ---
-    self.frame_secundarios = ctk.CTkFrame(self, fg_color="transparent")
-    self.frame_secundarios.pack(pady=(2, 5))
+    self.btn_parar.pack(pady=3)
 
     self.btn_salvar = ctk.CTkButton(
-        self.frame_secundarios,
+        self,
         text="Salvar Parâmetros",
         command=self.acao_salvar_parametros,
-        height=28,
-        width=218,
-        fg_color="#27AE60",
-        hover_color="#1E8449",
-        font=ctk.CTkFont(size=11, weight="bold"),
+        height=ALTURA_BTN,
+        width=LARGURA_BTN,
+        font=ctk.CTkFont(size=12, weight="bold"),
     )
-    self.btn_salvar.pack(side="left", padx=4)
+    self.btn_salvar.pack(pady=3)
 
     self.btn_sobre = ctk.CTkButton(
-        self.frame_secundarios,
+        self,
         text="Sobre",
         command=self.mostrar_sobre,
-        height=28,
-        width=218,
-        fg_color="#7F8C8D",
-        hover_color="#62686F",
-        font=ctk.CTkFont(size=11, weight="bold"),
+        height=ALTURA_BTN,
+        width=LARGURA_BTN,
+        font=ctk.CTkFont(size=12, weight="bold"),
     )
-    self.btn_sobre.pack(side="left", padx=4)
+    self.btn_sobre.pack(pady=3)
 
-    # Barra de Progresso
+    self.btn_sair = ctk.CTkButton(
+        self,
+        text="Sair do Aplicativo",
+        command=self.destroy,
+        height=ALTURA_BTN,
+        width=LARGURA_BTN,
+        font=ctk.CTkFont(size=12, weight="bold"),
+    )
+    self.btn_sair.pack(pady=3)
+
     self.progress_bar = ctk.CTkProgressBar(self, width=445, height=10)
     self.progress_bar.set(0)
-    self.progress_bar.pack(pady=(2, 2))
+    self.progress_bar.pack(pady=(5, 2))
 
-    # Rótulo de Status
     self.label_status = ctk.CTkLabel(
         self, text="Pronto para iniciar.", font=ctk.CTkFont(size=11)
     )
@@ -298,6 +295,9 @@ class AppExportacao(ctk.CTk):
             self.entries[chave].insert(0, config["DATABASE"][chave])
 
       if "FILTROS" in config:
+        if "arquivo_saida" in config["FILTROS"]:
+          self.entry_arquivo.delete(0, "end")
+          self.entry_arquivo.insert(0, config["FILTROS"]["arquivo_saida"])
         if "ignorar" in config["FILTROS"]:
           self.entry_ignorar.delete(0, "end")
           self.entry_ignorar.insert(0, config["FILTROS"]["ignorar"])
@@ -324,6 +324,7 @@ class AppExportacao(ctk.CTk):
       for chave, valor in defaults.items():
         self.entries[chave].delete(0, "end")
         self.entries[chave].insert(0, valor)
+      self.entry_arquivo.insert(0, "PROTHEUS_TODAS_TABELAS.xlsx")
       self.option_tema.set("Sistema")
 
   def salvar_configuracoes(self):
@@ -334,6 +335,9 @@ class AppExportacao(ctk.CTk):
       config["DATABASE"][chave] = entry.get().strip()
 
     config["FILTROS"] = {}
+    config["FILTROS"]["arquivo_saida"] = (
+        self.entry_arquivo.get().strip() or "PROTHEUS_TODAS_TABELAS.xlsx"
+    )
     config["FILTROS"]["ignorar"] = self.entry_ignorar.get().strip()
     config["FILTROS"]["prefixos"] = self.entry_prefixos.get().strip()
     config["FILTROS"]["exportar_vazias"] = str(self.check_vazias.get())
@@ -406,12 +410,13 @@ class AppExportacao(ctk.CTk):
     btn_fechar.pack()
 
   def iniciar_processo_thread(self):
-    if os.path.exists(FILE_NAME):
+    file_name = self.entry_arquivo.get().strip() or "PROTHEUS_TODAS_TABELAS.xlsx"
+    if os.path.exists(file_name):
       CustomMessageBox.mostrar_mensagem(
           self,
           "Arquivo Existente",
           (
-              f"O arquivo '{FILE_NAME}' já existe e será substituído.\nDeseja"
+              f"O arquivo '{file_name}' já existe e será substituído.\nDeseja"
               " continuar?"
           ),
           tipo="pergunta",
@@ -479,23 +484,27 @@ class AppExportacao(ctk.CTk):
     return tables_filtradas
 
   def sanitizar_nome_aba(self, nome_tabela):
+    # Trata caracteres inválidos e evita palavras reservadas do Excel/openpyxl (ex: SRA)
     nome_limpo = re.sub(r'[:\\/\?\*\[\]]', "_", nome_tabela)
+    if nome_limpo.upper() in ["SRA", "LOG", "HISTORY"]:
+      nome_limpo = f"T_{nome_limpo}"
     return nome_limpo[:31]
 
-  def abrir_planilha(self):
+  def abrir_planilha(self, file_name):
     try:
-      if os.path.exists(FILE_NAME):
+      if os.path.exists(file_name):
         if platform.system() == "Windows":
-          os.startfile(FILE_NAME)
+          os.startfile(file_name)
         elif platform.system() == "Darwin":
-          subprocess.call(("open", FILE_NAME))
+          subprocess.call(("open", file_name))
         else:
-          subprocess.call(("xdg-open", FILE_NAME))
+          subprocess.call(("xdg-open", file_name))
     except Exception as e:
       logging.error(f"Erro ao abrir a planilha: {e}")
 
   def export_all_tables_to_excel(self):
     registros_log = []
+    file_name = self.entry_arquivo.get().strip() or "PROTHEUS_TODAS_TABELAS.xlsx"
 
     try:
       texto_ignorar = self.entry_ignorar.get().strip()
@@ -526,80 +535,119 @@ class AppExportacao(ctk.CTk):
         self.restaurar_botoes()
         return
 
-      with pd.ExcelWriter(FILE_NAME, engine="openpyxl") as writer:
-        exportadas_count = 0
-        for i, table_name in enumerate(tables, 1):
-          if self.cancelar_execucao:
-            self.label_status.configure(text="Processo interrompido pelo usuário.")
-            registros_log.append({
-                "tabela": table_name,
-                "mensagem": "Processo interrompido pelo usuário.",
-            })
-            break
+      dados_tabelas = {}
+      for i, table_name in enumerate(tables, 1):
+        if self.cancelar_execucao:
+          self.label_status.configure(text="Processo interrompido pelo usuário.")
+          registros_log.append({
+              "tabela": table_name,
+              "mensagem": "Processo interrompido pelo usuário.",
+          })
+          break
 
-          progresso = i / total_tables
-          self.progress_bar.set(progresso)
-          self.label_status.configure(
-              text=f"Processando ({i}/{total_tables}): {table_name}"
-          )
+        progresso = (i / total_tables) * 0.5
+        self.progress_bar.set(progresso)
+        self.label_status.configure(
+            text=f"Lendo do Banco ({i}/{total_tables}): {table_name}"
+        )
 
-          sheet_name = self.sanitizar_nome_aba(table_name)
+        try:
+          query = f"SELECT * FROM [{table_name}]"
+          with engine.connect() as connection:
+            df = pd.read_sql(query, connection)
 
-          try:
-            query = f"SELECT * FROM [{table_name}]"
-            with engine.connect() as connection:
-              df = pd.read_sql(query, connection)
-
-            if len(df) == 0 and not exportar_vazias:
-              registros_log.append({
-                  "tabela": table_name,
-                  "mensagem": (
-                      "Ignorada: tabela vazia (zero registros) conforme"
-                      " configuração."
-                  ),
-              })
-              continue
-
-            df.to_excel(writer, sheet_name=sheet_name, index=False)
-            exportadas_count += 1
+          if len(df) == 0 and not exportar_vazias:
             registros_log.append({
                 "tabela": table_name,
                 "mensagem": (
-                    f"Sucesso: Exportada para a aba '{sheet_name}' com"
-                    f" {len(df)} registro(s)."
+                    "Ignorada: tabela vazia (zero registros) conforme"
+                    " configuração."
                 ),
             })
-          except Exception as e:
-            erro_msg = f"Erro ao processar a tabela: {e}"
-            logging.error(f"Tabela '{table_name}': {erro_msg}")
-            registros_log.append({"tabela": table_name, "mensagem": erro_msg})
+            continue
 
-        if registros_log:
-          df_log = pd.DataFrame(registros_log)
-          df_log.to_excel(writer, sheet_name="LOG", index=False)
+          dados_tabelas[table_name] = df
+          registros_log.append({
+              "tabela": table_name,
+              "mensagem": f"Sucesso: Lida com {len(df)} registro(s).",
+          })
+        except Exception as e:
+          erro_msg = f"Erro ao processar/ler a tabela: {e}"
+          logging.error(f"Tabela '{table_name}': {erro_msg}")
+          registros_log.append({"tabela": table_name, "mensagem": erro_msg})
 
-      self.progress_bar.set(1.0)
-      self.label_status.configure(text="Exportação concluída com sucesso!")
+      if dados_tabelas and not self.cancelar_execucao:
+        try:
+          with pd.ExcelWriter(file_name, engine="openpyxl") as writer:
+            total_gravacao = len(dados_tabelas)
+            for idx, (table_name, df) in enumerate(dados_tabelas.items(), 1):
+              progresso = 0.5 + ((idx / total_gravacao) * 0.5)
+              self.progress_bar.set(progresso)
+              self.label_status.configure(
+                  text=f"Gravando no Excel ({idx}/{total_gravacao}): {table_name}"
+              )
 
-      mensagem_final = (
-          f"Processo concluído!\nTabelas exportadas: {exportadas_count}\nArquivo"
-          f" salvo como '{FILE_NAME}' (com aba 'LOG').\n\nDeseja abrir a"
-          " planilha gerada agora?"
-      )
+              sheet_name = self.sanitizar_nome_aba(table_name)
+              try:
+                df.to_excel(writer, sheet_name=sheet_name, index=False)
+              except Exception as e_aba:
+                erro_aba = f"Erro ao gravar aba '{sheet_name}': {e_aba}"
+                logging.error(f"Tabela '{table_name}': {erro_aba}")
+                registros_log.append({"tabela": table_name, "mensagem": erro_aba})
 
-      self.after(
-          100,
-          lambda: CustomMessageBox.mostrar_mensagem(
-              self,
-              "Sucesso",
-              mensagem_final,
-              tipo="pergunta",
-              callback_sim=self.abrir_planilha,
-          ),
-      )
+            if registros_log:
+              df_log = pd.DataFrame(registros_log)
+              df_log.to_excel(writer, sheet_name="LOG", index=False)
+
+          self.progress_bar.set(1.0)
+          self.label_status.configure(text="Exportação concluída com sucesso!")
+
+          exportadas_count = len(dados_tabelas)
+          mensagem_final = (
+              f"Processo concluído!\nTabelas processadas: {exportadas_count}\nArquivo"
+              f" salvo como '{file_name}' (com aba 'LOG').\n\nDeseja abrir a"
+              " planilha gerada agora?"
+          )
+
+          self.after(
+              100,
+              lambda: CustomMessageBox.mostrar_mensagem(
+                  self,
+                  "Sucesso",
+                  mensagem_final,
+                  tipo="pergunta",
+                  callback_sim=lambda: self.abrir_planilha(file_name),
+              ),
+          )
+
+        except Exception as e_excel:
+          erro_gravacao = f"Erro crítico ao gravar o arquivo Excel: {e_excel}"
+          logging.error(erro_gravacao)
+          self.label_status.configure(text="Erro ao gravar arquivo!")
+          self.after(
+              100,
+              lambda: CustomMessageBox.mostrar_mensagem(
+                  self, "Erro Crítico", erro_gravacao, tipo="info"
+              ),
+          )
+      else:
+        if not self.cancelar_execucao:
+          self.label_status.configure(text="Nenhuma tabela válida para gravar.")
+          self.after(
+              100,
+              lambda: CustomMessageBox.mostrar_mensagem(
+                  self,
+                  "Atenção",
+                  (
+                      "Nenhuma tabela foi lida com sucesso para gerar a"
+                      " planilha."
+                  ),
+                  tipo="info",
+              ),
+          )
 
     except Exception as e:
-      erro_fatal = f"Erro crítico: {e}"
+      erro_fatal = f"Erro crítico geral: {e}"
       logging.error(erro_fatal)
       self.label_status.configure(text="Erro no processo!")
       self.after(
