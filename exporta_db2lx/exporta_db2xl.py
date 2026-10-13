@@ -89,7 +89,7 @@ class AppExportacao(ctk.CTk):
     super().__init__()
 
     self.title("Exportador Protheus para Excel")
-    self.geometry("480x810")  # Altura ajustada para acomodar os novos labels
+    self.geometry("480x610")
     self.resizable(False, False)
 
     self.cancelar_execucao = False
@@ -99,20 +99,20 @@ class AppExportacao(ctk.CTk):
     self.label_titulo = ctk.CTkLabel(
         self,
         text="Exportar Tabelas do Protheus",
-        font=ctk.CTkFont(size=16, weight="bold"),
+        font=ctk.CTkFont(size=15, weight="bold"),
     )
-    self.label_titulo.pack(pady=(10, 5))
+    self.label_titulo.pack(pady=(8, 4))
 
     # --- Seção de Configurações do Banco de Dados ---
     self.frame_db = ctk.CTkFrame(self, fg_color="transparent")
-    self.frame_db.pack(pady=(0, 5), padx=15, fill="x")
+    self.frame_db.pack(pady=(0, 4), padx=15, fill="x")
 
     self.label_db_titulo = ctk.CTkLabel(
         self.frame_db,
         text="Configurações de Conexão (SQL Server)",
-        font=ctk.CTkFont(size=12, weight="bold"),
+        font=ctk.CTkFont(size=11, weight="bold"),
     )
-    self.label_db_titulo.pack(anchor="w", pady=(0, 2))
+    self.label_db_titulo.pack(anchor="w", pady=(0, 1))
 
     self.entries = {}
     campos = [
@@ -128,11 +128,11 @@ class AppExportacao(ctk.CTk):
       row_frame.pack(fill="x", pady=1)
 
       lbl = ctk.CTkLabel(
-          row_frame, text=rotulo, width=105, anchor="w", font=ctk.CTkFont(size=11)
+          row_frame, text=rotulo, width=100, anchor="w", font=ctk.CTkFont(size=10)
       )
       lbl.pack(side="left")
 
-      entry = ctk.CTkEntry(row_frame, width=335, height=24)
+      entry = ctk.CTkEntry(row_frame, width=340, height=22)
       if chave == "password":
         entry.configure(show="*")
       entry.pack(side="left", padx=2)
@@ -141,154 +141,163 @@ class AppExportacao(ctk.CTk):
 
     # --- Seção de Saída e Filtros com Labels Individuais ---
     self.frame_filtros = ctk.CTkFrame(self, fg_color="transparent")
-    self.frame_filtros.pack(pady=(0, 5), padx=15, fill="x")
+    self.frame_filtros.pack(pady=(0, 4), padx=15, fill="x")
 
     self.label_filtros_titulo = ctk.CTkLabel(
         self.frame_filtros,
         text="Saída, Filtros e Aparência",
-        font=ctk.CTkFont(size=12, weight="bold"),
+        font=ctk.CTkFont(size=11, weight="bold"),
     )
-    self.label_filtros_titulo.pack(anchor="w", pady=(0, 2))
+    self.label_filtros_titulo.pack(anchor="w", pady=(0, 1))
 
     # 1. Arquivo de Saída
     lbl_arquivo = ctk.CTkLabel(
         self.frame_filtros,
         text="Nome do arquivo de saída:",
-        font=ctk.CTkFont(size=11),
+        font=ctk.CTkFont(size=10),
     )
-    lbl_arquivo.pack(anchor="w", pady=(2, 1))
+    lbl_arquivo.pack(anchor="w", pady=(1, 0))
 
     self.entry_arquivo = ctk.CTkEntry(
         self.frame_filtros,
         placeholder_text="ex: PROTHEUS.xlsx",
-        width=445,
-        height=26,
+        width=440,
+        height=22,
     )
-    self.entry_arquivo.pack(pady=(0, 4))
+    self.entry_arquivo.pack(pady=(0, 2))
 
     # 2. Ignorar Tabelas
     lbl_ignorar = ctk.CTkLabel(
         self.frame_filtros,
         text="Ignorar tabelas contendo (separado por ';'):",
-        font=ctk.CTkFont(size=11),
+        font=ctk.CTkFont(size=10),
     )
-    lbl_ignorar.pack(anchor="w", pady=(2, 1))
+    lbl_ignorar.pack(anchor="w", pady=(1, 0))
 
     self.entry_ignorar = ctk.CTkEntry(
         self.frame_filtros,
         placeholder_text="ex: 990; 010; LOG",
-        width=445,
-        height=26,
+        width=440,
+        height=22,
     )
-    self.entry_ignorar.pack(pady=(0, 4))
+    self.entry_ignorar.pack(pady=(0, 2))
 
     # 3. Filtrar por Prefixos
     lbl_prefixos = ctk.CTkLabel(
         self.frame_filtros,
         text="Somente tabelas com prefixos (separado por ';'):",
-        font=ctk.CTkFont(size=11),
+        font=ctk.CTkFont(size=10),
     )
-    lbl_prefixos.pack(anchor="w", pady=(2, 1))
+    lbl_prefixos.pack(anchor="w", pady=(1, 0))
 
     self.entry_prefixos = ctk.CTkEntry(
         self.frame_filtros,
         placeholder_text="ex: SX; SB; SC (vazio para todas)",
-        width=445,
-        height=26,
+        width=440,
+        height=22,
     )
-    self.entry_prefixos.pack(pady=(0, 4))
+    self.entry_prefixos.pack(pady=(0, 2))
 
     # Linha horizontal compacta para Checkbox e Tema
     frame_opcoes = ctk.CTkFrame(self.frame_filtros, fg_color="transparent")
-    frame_opcoes.pack(fill="x", pady=(2, 2))
+    frame_opcoes.pack(fill="x", pady=(1, 1))
 
     self.check_vazias = ctk.CTkCheckBox(
         frame_opcoes,
         text="Exportar vazias",
-        font=ctk.CTkFont(size=11),
-        checkbox_width=18,
-        checkbox_height=18,
+        font=ctk.CTkFont(size=10),
+        checkbox_width=16,
+        checkbox_height=16,
     )
     self.check_vazias.pack(side="left", padx=(2, 0))
     self.check_vazias.select()
 
     lbl_tema = ctk.CTkLabel(
-        frame_opcoes, text="Tema:", font=ctk.CTkFont(size=11)
+        frame_opcoes, text="Tema:", font=ctk.CTkFont(size=10)
     )
-    lbl_tema.pack(side="left", padx=(20, 5))
+    lbl_tema.pack(side="left", padx=(25, 5))
 
     self.option_tema = ctk.CTkOptionMenu(
         frame_opcoes,
         values=["Sistema", "Claro", "Escuro"],
         command=self.mudar_tema_interface,
-        width=120,
-        height=24,
+        width=110,
+        height=22,
     )
     self.option_tema.pack(side="left")
 
-    # --- Botões Padronizados ---
-    LARGURA_BTN = 445
-    ALTURA_BTN = 30
+    # --- Botões Organizados em Duas Colunas (2 por linha) ---
+    LARGURA_BTN = 215
+    ALTURA_BTN = 28
+
+    frame_botoes_1 = ctk.CTkFrame(self, fg_color="transparent")
+    frame_botoes_1.pack(pady=2)
 
     self.btn_iniciar = ctk.CTkButton(
-        self,
+        frame_botoes_1,
         text="Iniciar Exportação",
         command=self.iniciar_processo_thread,
         height=ALTURA_BTN,
         width=LARGURA_BTN,
-        font=ctk.CTkFont(size=12, weight="bold"),
+        font=ctk.CTkFont(size=11, weight="bold"),
     )
-    self.btn_iniciar.pack(pady=3)
+    self.btn_iniciar.pack(side="left", padx=5)
 
     self.btn_parar = ctk.CTkButton(
-        self,
+        frame_botoes_1,
         text="Interromper",
         command=self.solicitar_parada,
         height=ALTURA_BTN,
         width=LARGURA_BTN,
         state="disabled",
-        font=ctk.CTkFont(size=12, weight="bold"),
+        font=ctk.CTkFont(size=11, weight="bold"),
     )
-    self.btn_parar.pack(pady=3)
+    self.btn_parar.pack(side="left", padx=5)
+
+    frame_botoes_2 = ctk.CTkFrame(self, fg_color="transparent")
+    frame_botoes_2.pack(pady=2)
 
     self.btn_salvar = ctk.CTkButton(
-        self,
+        frame_botoes_2,
         text="Salvar Parâmetros",
         command=self.acao_salvar_parametros,
         height=ALTURA_BTN,
         width=LARGURA_BTN,
-        font=ctk.CTkFont(size=12, weight="bold"),
+        font=ctk.CTkFont(size=11, weight="bold"),
     )
-    self.btn_salvar.pack(pady=3)
+    self.btn_salvar.pack(side="left", padx=5)
 
     self.btn_sobre = ctk.CTkButton(
-        self,
+        frame_botoes_2,
         text="Sobre",
         command=self.mostrar_sobre,
         height=ALTURA_BTN,
         width=LARGURA_BTN,
-        font=ctk.CTkFont(size=12, weight="bold"),
+        font=ctk.CTkFont(size=11, weight="bold"),
     )
-    self.btn_sobre.pack(pady=3)
+    self.btn_sobre.pack(side="left", padx=5)
+
+    frame_botoes_3 = ctk.CTkFrame(self, fg_color="transparent")
+    frame_botoes_3.pack(pady=2)
 
     self.btn_sair = ctk.CTkButton(
-        self,
+        frame_botoes_3,
         text="Sair do Aplicativo",
         command=self.destroy,
         height=ALTURA_BTN,
-        width=LARGURA_BTN,
-        font=ctk.CTkFont(size=12, weight="bold"),
+        width=440,
+        font=ctk.CTkFont(size=11, weight="bold"),
     )
-    self.btn_sair.pack(pady=3)
+    self.btn_sair.pack(padx=5)
 
-    self.progress_bar = ctk.CTkProgressBar(self, width=445, height=10)
+    self.progress_bar = ctk.CTkProgressBar(self, width=440, height=8)
     self.progress_bar.set(0)
-    self.progress_bar.pack(pady=(5, 2))
+    self.progress_bar.pack(pady=(4, 2))
 
     self.label_status = ctk.CTkLabel(
-        self, text="Pronto para iniciar.", font=ctk.CTkFont(size=11)
+        self, text="Pronto para iniciar.", font=ctk.CTkFont(size=10)
     )
-    self.label_status.pack(pady=(0, 5))
+    self.label_status.pack(pady=(0, 4))
 
     self.carregar_valores_campos()
 
@@ -517,6 +526,14 @@ class AppExportacao(ctk.CTk):
       nome_limpo = f"T_{nome_limpo}"
     return nome_limpo[:31]
 
+  def limpar_dados_dataframe(self, df):
+    """Converte colunas problemáticas (como dicts/json) para string para evitar crashes no Excel."""
+    for col in df.columns:
+      df[col] = df[col].apply(
+          lambda x: str(x) if isinstance(x, (dict, list)) else x
+      )
+    return df
+
   def abrir_planilha(self, file_name):
     try:
       if os.path.exists(file_name):
@@ -593,6 +610,9 @@ class AppExportacao(ctk.CTk):
             })
             continue
 
+          # Limpa dados complexos para evitar falhas de gravação
+          df = self.limpar_dados_dataframe(df)
+
           dados_tabelas[table_name] = df
           registros_log.append({
               "tabela": table_name,
@@ -607,6 +627,8 @@ class AppExportacao(ctk.CTk):
         try:
           with pd.ExcelWriter(file_name, engine="openpyxl") as writer:
             total_gravacao = len(dados_tabelas)
+            tabelas_sucesso = 0
+
             for idx, (table_name, df) in enumerate(dados_tabelas.items(), 1):
               progresso = 0.5 + ((idx / total_gravacao) * 0.5)
               self.progress_bar.set(progresso)
@@ -617,10 +639,14 @@ class AppExportacao(ctk.CTk):
               sheet_name = self.sanitizar_nome_aba(table_name)
               try:
                 df.to_excel(writer, sheet_name=sheet_name, index=False)
+                tabelas_sucesso += 1
               except Exception as e_aba:
                 erro_aba = f"Erro ao gravar aba '{sheet_name}': {e_aba}"
                 logging.error(f"Tabela '{table_name}': {erro_aba}")
-                registros_log.append({"tabela": table_name, "mensagem": erro_aba})
+                # Atualiza a mensagem na lista de log para registrar o erro de gravação
+                for reg in registros_log:
+                  if reg["tabela"] == table_name:
+                    reg["mensagem"] = erro_aba
 
             if registros_log:
               df_log = pd.DataFrame(registros_log)
@@ -629,11 +655,10 @@ class AppExportacao(ctk.CTk):
           self.progress_bar.set(1.0)
           self.label_status.configure(text="Exportação concluída com sucesso!")
 
-          exportadas_count = len(dados_tabelas)
           mensagem_final = (
-              f"Processo concluído!\nTabelas processadas: {exportadas_count}\nArquivo"
-              f" salvo como '{file_name}' (com aba 'LOG').\n\nDeseja abrir a"
-              " planilha gerada agora?"
+              f"Processo concluído!\nTabelas gravadas com sucesso:"
+              f" {tabelas_sucesso}\nArquivo salvo como '{file_name}' (com aba"
+              " 'LOG').\n\nDeseja abrir a planilha gerada agora?"
           )
 
           self.after(
