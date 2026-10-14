@@ -1,2 +1,5 @@
 .vscode/launch.json
 PROTHEUS.XLSX
+build/
+dist/
+exporta_db2xl.spec
